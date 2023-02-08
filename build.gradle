@@ -1,0 +1,54 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven { url "https://plugins.gradle.org/m2/"}
+    }
+
+    dependencies {
+        classpath "org.unbroken-dome.gradle-plugins.helm:helm-plugin:1.7.0"
+    }
+}
+
+apply plugin: 'org.unbroken-dome.helm'
+
+group = 'org.salgar.akka.fsm'
+
+ext {
+    flag = true
+}
+
+if(ext.flag) {
+    ext.props = [
+            HELM_USER: property('HELM_USER'),
+            HELM_PASSWORD: property('HELM_PASSWORD'),
+            FRAUD_PREVENTION_VERSION: property('fraud-prevention-version')
+    ]
+}
+
+helm {
+    downloadClient {
+        enabled = true
+        version = '3.10.1'
+    }
+    charts {
+        huc {
+            chartName = 'fsm-akka-helm-umbrella-chart'
+            chartVersion = "${project.version}"
+            sourceDir = file('helm')
+            filtering {
+                values.put 'appVersion', "${project.version}-${gitBranch()}"
+                values.put 'fraudPreventionVersion', "${props.FRAUD_PREVENTION_VERSION}"
+            }
+        }
+    }
+}
+
+def gitBranch() {
+    def branch = ""
+    def proc = "git rev-parse --abbrev-ref HEAD".execute()
+    proc.in.eachLine { line -> branch = line }
+    proc.err.eachLine { line -> println line }
+    proc.waitFor()
+    branch
+}

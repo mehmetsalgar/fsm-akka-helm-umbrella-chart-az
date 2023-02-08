@@ -1,0 +1,59 @@
+name: helm_publish
+
+trigger:
+- development
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+- group: HELM_VARIABLES
+- group: DOCKER_VARIABLES
+
+jobs:
+  - job: CalculateVersion
+    displayName: Calculate Version
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+     - checkout: self
+       fetchDepth: 0
+     - task: gitversion/setup@0
+       displayName: Install GitVersion
+       inputs:
+        versionSpec: "5.x"
+     - task: gitversion/execute@0
+       name: calculateVersion
+       displayName: Calculating version
+       inputs:
+        useConfigFile: True
+        configFilePath: "GitVersion.yml"
+  - job: Build
+    displayName: Build
+    dependsOn: CalculateVersion
+    pool:
+      vmImage: ubuntu-latest
+    variables:
+      version: $[dependencies.CalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
+    steps:
+     - task: Gradle@3
+       env:
+         ORG_GRADLE_PROJECT_HELM_USER: $(HELM_USER)
+         ORG_GRADLE_PROJECT_HELM_PASSWORD: $(HELM_PASSWORD)
+         ORG_GRADLE_PROJECT_DOCKER_HUB_USER: $(DOCKER_HUB_USER)
+         ORG_GRADLE_PROJECT_DOCKER_HUB_PASSWORD: $(DOCKER_HUB_PASSWORD)
+         ORG_GRADLE_PROJECT_DOCKER_UPLOAD_USER: $(DOCKER_UPLOAD_USER)
+         ORG_GRADLE_PROJECT_DOCKER_UPLOAD_PASSWORD: $(DOCKER_UPLOAD_PASSWORD)
+       inputs:
+        workingDirectory: ''
+        gradleWrapperFile: 'gradlew'
+        gradleOptions: '-Xmx3072m'
+        javaHomeOption: 'JDKVersion'
+        jdkVersionOption: '1.17'
+        jdkArchitectureOption: 'x64'
+        publishJUnitResults: true
+        testResultsFiles: '**/TEST-*.xml'
+        tasks: 'helmPackage -Pversion=$(version) --no-daemon'
+     - pwsh: |
+         helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
+         helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-$(version).tgz oci://fsmakka.azurecr.io/helm
