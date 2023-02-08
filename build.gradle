@@ -44,6 +44,16 @@ helm {
     }
 }
 
+task rl {
+    doLast {
+        logger.lifecycle("Version:  ${project.version}")
+    }
+}
+
+def registryLogin() {
+    "helm registry login fsmakka.azurecr.io --username ${HELM_USER} --password ${HELM_PASSWORD}".execute()
+}
+
 def gitBranch() {
     def branch = ""
     def proc = "git rev-parse --abbrev-ref HEAD".execute()
@@ -52,3 +62,5 @@ def gitBranch() {
     proc.waitFor()
     branch
 }
+
+tasks.helmRender.dependsOn tasks.rl
