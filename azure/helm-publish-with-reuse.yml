@@ -37,26 +37,8 @@ jobs:
       version: $[dependencies.CalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
     steps:
      - pwsh: |
-        helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
-     - task: Gradle@3
-       env:
-         ORG_GRADLE_PROJECT_HELM_USER: $(HELM_USER)
-         ORG_GRADLE_PROJECT_HELM_PASSWORD: $(HELM_PASSWORD)
-         ORG_GRADLE_PROJECT_DOCKER_HUB_USER: $(DOCKER_HUB_USER)
-         ORG_GRADLE_PROJECT_DOCKER_HUB_PASSWORD: $(DOCKER_HUB_PASSWORD)
-         ORG_GRADLE_PROJECT_DOCKER_UPLOAD_USER: $(DOCKER_UPLOAD_USER)
-         ORG_GRADLE_PROJECT_DOCKER_UPLOAD_PASSWORD: $(DOCKER_UPLOAD_PASSWORD)
-       inputs:
-        workingDirectory: ''
-        gradleWrapperFile: 'gradlew'
-        gradleOptions: '-Xmx3072m'
-        javaHomeOption: 'JDKVersion'
-        jdkVersionOption: '1.17'
-        jdkArchitectureOption: 'x64'
-        publishJUnitResults: true
-        testResultsFiles: '**/TEST-*.xml'
-        tasks: 'helmRender -Pversion=$(version) --no-daemon'
-     - pwsh: |
          helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
-         helm package /home/vsts/work/1/s/build/helm/
-         helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-$(version).tgz oci://fsmakka.azurecr.io/helm
+         cd /home/vsts/work/1/s/helm
+         helm dep up
+         helm package
+         helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-1.5.14.tgz oci://fsmakka.azurecr.io/helm
