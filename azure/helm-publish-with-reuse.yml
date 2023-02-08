@@ -55,6 +55,8 @@ jobs:
         jdkArchitectureOption: 'x64'
         publishJUnitResults: true
         testResultsFiles: '**/TEST-*.xml'
-        tasks: 'helmPackage -Pversion=$(version) --no-daemon'
+        tasks: 'helmFilter -Pversion=$(version) --no-daemon'
      - pwsh: |
+         helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
+         helm package /home/vsts/work/1/s/build/helm/
          helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-$(version).tgz oci://fsmakka.azurecr.io/helm
