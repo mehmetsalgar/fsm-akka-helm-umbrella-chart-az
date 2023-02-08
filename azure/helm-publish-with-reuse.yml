@@ -41,4 +41,4 @@ jobs:
          cd /home/vsts/work/1/s/helm
          helm dep up
          helm package .
-         helm push /home/vsts/work/1/s/helm/charts/fsm-akka-helm-umbrella-chart-az-1.5.14.tgz oci://fsmakka.azurecr.io/helm
+         helm push /home/vsts/work/1/s/helm/fsm-akka-helm-umbrella-chart-az-1.5.14.tgz oci://fsmakka.azurecr.io/helm
