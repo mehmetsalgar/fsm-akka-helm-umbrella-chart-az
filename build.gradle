@@ -28,7 +28,7 @@ if(ext.flag) {
 
 helm {
     downloadClient {
-        enabled = true
+        enabled = false
         version = '3.10.1'
     }
     charts {
