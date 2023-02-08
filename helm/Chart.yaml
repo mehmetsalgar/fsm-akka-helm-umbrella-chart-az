@@ -3,10 +3,10 @@ name: fsm-akka-application
 description: A Helm chart for Kubernetes
 type: application
 version: 1.0.0
-appVersion: "${appVersion}"
+appVersion: "1.5.14"
 
 dependencies:
   - name: fraud-prevention-application
-    version: "${fraudPreventionVersion}"
+    version: "1.2.0-alpha"
     repository: oci://fsmakka.azurecr.io/helm
     condition: fraud-prevention.enabled
