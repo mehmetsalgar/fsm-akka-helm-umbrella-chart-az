@@ -6,7 +6,7 @@ buildscript {
     }
 
     dependencies {
-        classpath "io.github.mehmetsalgar.gradle-plugins.helm:helm-plugin:1.0.4"
+        classpath "io.github.mehmetsalgar.gradle-plugins.helm:helm-plugin:1.0.5"
     }
 }
 
