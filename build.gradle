@@ -29,7 +29,7 @@ if(ext.flag) {
 helm {
     charts {
         huc {
-            chartName = 'fsm-akka-helm-umbrella-charta-az'
+            chartName = 'fsm-akka-helm-umbrella-chart-az'
             chartVersion = "${project.version}"
             sourceDir = file('helm')
             filtering {
