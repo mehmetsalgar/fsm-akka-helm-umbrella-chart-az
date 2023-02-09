@@ -6,11 +6,11 @@ buildscript {
     }
 
     dependencies {
-        classpath "org.unbroken-dome.gradle-plugins.helm:helm-plugin:1.7.0"
+        classpath "io.github.mehmetsalgar.gradle-plugins.helm:helm-plugin:1.0.4"
     }
 }
 
-apply plugin: 'org.unbroken-dome.helm'
+apply plugin: "io.github.mehmetsalgar.helm"
 
 group = 'org.salgar.akka.fsm'
 
@@ -27,13 +27,9 @@ if(ext.flag) {
 }
 
 helm {
-    downloadClient {
-        enabled = false
-        version = '3.10.1'
-    }
     charts {
         huc {
-            chartName = 'fsm-akka-helm-umbrella-chart'
+            chartName = 'fsm-akka-helm-umbrella-charta-az'
             chartVersion = "${project.version}"
             sourceDir = file('helm')
             filtering {
@@ -42,16 +38,15 @@ helm {
             }
         }
     }
-}
-
-task rl {
-    doLast {
-        logger.lifecycle("Version:  ${project.version}")
+    repositories {
+        ac_rep {
+            oci 'oci://fsmakka.azurecr.io/helm/'
+            credentials {
+                username = "${props.HELM_USER}"
+                password = "${props.HELM_PASSWORD}"
+            }
+        }
     }
-}
-
-def registryLogin() {
-    "helm registry login fsmakka.azurecr.io --username ${HELM_USER} --password ${HELM_PASSWORD}".execute()
 }
 
 def gitBranch() {
@@ -62,5 +57,3 @@ def gitBranch() {
     proc.waitFor()
     branch
 }
-
-tasks.helmRender.dependsOn tasks.rl
