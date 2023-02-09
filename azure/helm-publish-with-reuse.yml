@@ -56,4 +56,4 @@ jobs:
         tasks: 'helmPackage -Pversion=$(version) --no-daemon'
      - pwsh: |
          helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
-         helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-$(version).tgz oci://fsmakka.azurecr.io/helm
+         helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-az-$(version).tgz oci://fsmakka.azurecr.io/helm
