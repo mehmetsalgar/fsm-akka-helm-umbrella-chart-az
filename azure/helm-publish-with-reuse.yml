@@ -36,8 +36,6 @@ jobs:
     variables:
       version: $[dependencies.CalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
     steps:
-     - pwsh: |
-        helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
      - task: Gradle@3
        env:
          ORG_GRADLE_PROJECT_HELM_USER: $(HELM_USER)
@@ -57,4 +55,5 @@ jobs:
         testResultsFiles: '**/TEST-*.xml'
         tasks: 'helmPackage -Pversion=$(version) --no-daemon'
      - pwsh: |
+         helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
          helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-$(version).tgz oci://fsmakka.azurecr.io/helm
