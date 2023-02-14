@@ -43,7 +43,7 @@ stages:
             additionalArguments: '"/b" "${{ parameters.branchName }}"'
       - job: Build
         displayName: Build
-        dependsOn: CalculateVersion
+        dependsOn: CreateBranchCalculateVersion
         pool:
           vmImage: ubuntu-latest
         variables:
