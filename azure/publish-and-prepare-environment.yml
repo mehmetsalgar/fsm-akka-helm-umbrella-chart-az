@@ -47,7 +47,7 @@ stages:
         pool:
           vmImage: ubuntu-latest
         variables:
-          version: $[dependencies.CalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
+          version: $[dependencies.CreateBranchCalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
           service-version: ${{ parameters.serviceVersion }}
           source-repo: ${{ parameters.repoName }}
         steps:
