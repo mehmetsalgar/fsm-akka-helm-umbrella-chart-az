@@ -1,0 +1,75 @@
+name: Publish and Prepare Environment
+trigger: none
+
+parameters:
+  - name: branchName
+    type: string
+  - name: repoName
+    type: string
+  - name: serviceVersion
+    type: string
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    jobs:
+      - job: CreateBranchCalculateVersion
+        steps:
+        - checkout: self
+          clean: true
+          fetchDepth: 0
+          persistCredentials: true
+        - script: |
+            git fetch --all
+            git config --global user.email "$(Build.RequestedForEmail)"
+            git config --global user.name "$(Build.RequestedFor)"
+            git checkout -b $BRANCH_NAME
+            git push -u origin $BRANCH_NAME
+          displayName: Git Create Branch
+          env:
+            BRANCH_NAME: ${{ parameters.branchName }}
+        - task: gitversion/setup@0
+          displayName: Install GitVersion
+          inputs:
+            versionSpec: "5.x"
+        - task: gitversion/execute@0
+          name: calculateVersion
+          displayName: Calculating version
+          inputs:
+            useConfigFile: True
+            configFilePath: "GitVersion.yml"
+            additionalArguments: '"/b" "${{ parameters.branchName }}"'
+      - job: Build
+        displayName: Build
+        dependsOn: CalculateVersion
+        pool:
+          vmImage: ubuntu-latest
+        variables:
+          version: $[dependencies.CalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
+          service-version: ${{ parameters.serviceVersion }}
+          source-repo: ${{ parameters.repoName }}
+        steps:
+          - task: Gradle@3
+            env:
+              ORG_GRADLE_PROJECT_HELM_USER: $(HELM_USER)
+              ORG_GRADLE_PROJECT_HELM_PASSWORD: $(HELM_PASSWORD)
+              ORG_GRADLE_PROJECT_DOCKER_HUB_USER: $(DOCKER_HUB_USER)
+              ORG_GRADLE_PROJECT_DOCKER_HUB_PASSWORD: $(DOCKER_HUB_PASSWORD)
+              ORG_GRADLE_PROJECT_DOCKER_UPLOAD_USER: $(DOCKER_UPLOAD_USER)
+              ORG_GRADLE_PROJECT_DOCKER_UPLOAD_PASSWORD: $(DOCKER_UPLOAD_PASSWORD)
+            inputs:
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '1.17'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: false
+              testResultsFiles: '**/TEST-*.xml'
+              tasks: 'helmPackage -Pversion=$(version) -P$(source-repo)-version=$(service-version) --no-daemon'
+          - pwsh: |
+              helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
+              helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chartz-az-$(version).tgz oci://fsmakka.azurecr.io/helm
+
