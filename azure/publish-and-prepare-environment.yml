@@ -1,9 +1,10 @@
+name: Publish and Prepare Environment
 trigger: none
 
 parameters:
   - name: branchName
     type: string
-  - name: serviceName
+  - name: repoName
     type: string
   - name: serviceVersion
     type: string
@@ -47,7 +48,6 @@ stages:
           vmImage: ubuntu-latest
         variables:
           version: $[dependencies.CalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
-          service-name: ${{ parameters.serviceName }}
           service-version: ${{ parameters.serviceVersion }}
           source-repo: ${{ parameters.repoName }}
         steps:
@@ -66,9 +66,9 @@ stages:
               javaHomeOption: 'JDKVersion'
               jdkVersionOption: '1.17'
               jdkArchitectureOption: 'x64'
-              publishJUnitResults: true
+              publishJUnitResults: false
               testResultsFiles: '**/TEST-*.xml'
-              tasks: 'helmPackage -Pversion=$(version) -P${{ parameters.repoName }}-version=$(serviceVersion) --no-daemon'
+              tasks: 'helmPackage -Pversion=$(version) -P$(source-repo)-version=$(service-version) --no-daemon'
           - pwsh: |
               helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
               helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chartz-az-$(version).tgz oci://fsmakka.azurecr.io/helm
