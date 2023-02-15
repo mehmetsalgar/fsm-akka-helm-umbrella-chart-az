@@ -16,6 +16,14 @@ variables:
   - group: HELM_VARIABLES
   - group: DOCKER_VARIABLES
 
+resources:
+  repositories:
+    - repository: ServiceUmbrellaChartRepository
+      type: github
+      endpoint: mehmetsalgar
+      name: mehmetsalgar/fsm-akka-helm-umbrella-chart-az
+      ref: ${{ parameters.branchName }}
+
 stages:
   - stage: Build
     jobs:
@@ -55,6 +63,7 @@ stages:
           service-version: ${{ parameters.serviceVersion }}
           source-repo: ${{ parameters.repoName }}
         steps:
+          - checkout: ServiceUmbrellaChartRepository
           - task: Gradle@3
             env:
               ORG_GRADLE_PROJECT_HELM_USER: $(HELM_USER)
