@@ -12,6 +12,10 @@ parameters:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  - group: HELM_VARIABLES
+  - group: DOCKER_VARIABLES
+
 stages:
   - stage: Build
     jobs:
