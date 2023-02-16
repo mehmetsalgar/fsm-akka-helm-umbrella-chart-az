@@ -96,4 +96,4 @@ stages:
             parameters:
               definitionId: "18"
               sourceBranch: "$(umbrella-chart-base-name)"
-              inputs: '"branchName": "${{ parameters.branchName }}","tag": "$(source-repo)-$(service-version)", "version": "$(service-version)"'
+              inputs: '"branchName": "${{ parameters.branchName }}","tag": "$(source-repo)-$(service-version)", "version": "$(version)"'
