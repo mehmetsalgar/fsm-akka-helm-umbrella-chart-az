@@ -1,0 +1,21 @@
+name: CreateBranchwithReuse
+trigger: none
+
+parameters:
+  - name: branchName
+    type: string
+
+pool:
+  vmImage: ubuntu-latest
+
+resources:
+  repositories:
+    - repository: fsm-akka-azure-pipelines
+      type: github
+      name: mehmetsalgar/fsm-akka-azure-pipelines
+      endpoint: mehmetsalgar
+
+stages:
+  - template: create-branch.yml@fsm-akka-azure-pipelines
+    parameters:
+      branchName: ${{ parameters.branchName }}
