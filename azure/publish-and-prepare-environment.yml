@@ -97,7 +97,7 @@ stages:
         dependsOn:
           - HelmPushServiceUmbrellaChart
         variables:
-          umbrella-chart-base-name: ${{ parameters. umbrellaChartBaseName}}
+          umbrella-chart-base-name: ${{ parameters.umbrellaChartBaseName }}
           service-version: ${{ parameters.serviceVersion }}
           source-repo: ${{ parameters.repoName }}
         steps:
