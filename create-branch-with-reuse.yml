@@ -1,0 +1,5 @@
+name: CreateBranchwithReuse
+trigger: none
+
+stages:
+  - stage: Build
