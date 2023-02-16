@@ -36,19 +36,9 @@ stages:
       - job: CreateBranchCalculateVersion
         displayName: Create Branch Calculate Version
         steps:
-        - checkout: self
-          clean: true
+        - checkout: ServiceUmbrellaChartRepository
           fetchDepth: 0
-          persistCredentials: true
-        - script: |
-            git fetch --all
-            git config --global user.email "$(Build.RequestedForEmail)"
-            git config --global user.name "$(Build.RequestedFor)"
-            git checkout -b $BRANCH_NAME
-            git push -u origin $BRANCH_NAME
-          displayName: Git Create Branch
-          env:
-            BRANCH_NAME: ${{ parameters.branchName }}
+          fetchTags: true
         - task: gitversion/setup@0
           displayName: Install GitVersion
           inputs:
