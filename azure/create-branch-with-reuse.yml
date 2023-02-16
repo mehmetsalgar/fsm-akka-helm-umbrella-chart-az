@@ -16,6 +16,10 @@ resources:
       endpoint: mehmetsalgar
 
 stages:
-  - template: create-branch.yml@fsm-akka-azure-pipelines
-    parameters:
-      branchName: ${{ parameters.branchName }}
+  - stage: Build
+    jobs:
+      - job: CreateBranch
+        steps:
+          - template: create-branch.yml@fsm-akka-azure-pipelines
+            parameters:
+              branchName: ${{ parameters.branchName }}
