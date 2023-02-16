@@ -8,6 +8,8 @@ parameters:
     type: string
   - name: serviceVersion
     type: string
+  - name: umbrellaChartBaseName
+    type: string
 
 pool:
   vmImage: ubuntu-latest
@@ -23,6 +25,10 @@ resources:
       endpoint: mehmetsalgar
       name: mehmetsalgar/fsm-akka-helm-umbrella-chart-az
       ref: ${{ parameters.branchName }}
+    - repository: fsm-akka-azure-pipelines
+      type: github
+      name: mehmetsalgar/fsm-akka-azure-pipelines
+      endpoint: mehmetsalgar
 
 stages:
   - stage: Build
@@ -86,4 +92,17 @@ stages:
           - pwsh: |
               helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
               helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-az-$(version).tgz oci://fsmakka.azurecr.io/helm
-
+      - job: PreparingDevEnvironmentRepository
+        displayName: Preparing Dev Environment Repository
+        dependsOn:
+          - HelmPushServiceUmbrellaChart
+        variables:
+          umbrella-chart-base-name: ${{ parameters. umbrellaChartBaseName}}
+          service-version: ${{ parameters.serviceVersion }}
+          source-repo: ${{ parameters.repoName }}
+        steps:
+          - template: dispatch.yml@fsm-akka-azure-pipelines
+            parameters:
+              definitionId: "18"
+              sourceBranch: "$(umbrella-chart-base-name)"
+              inputs: '"branchName": "${{ parameters.branchName }}","tag": "$(source-repo)-$(service-version)", "version": "$(service-version)"'
