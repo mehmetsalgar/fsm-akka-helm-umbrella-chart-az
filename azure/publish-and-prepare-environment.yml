@@ -85,8 +85,10 @@ stages:
       - job: PreparingDevEnvironmentRepository
         displayName: Preparing Dev Environment Repository
         dependsOn:
+          - CreateBranchCalculateVersion
           - HelmPushServiceUmbrellaChart
         variables:
+          version: $[dependencies.CreateBranchCalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
           umbrella-chart-base-name: ${{ parameters.umbrellaChartBaseName }}
           service-version: ${{ parameters.serviceVersion }}
           source-repo: ${{ parameters.repoName }}
