@@ -1,7 +1,12 @@
 name: helm_publish
 
 trigger:
-- development
+  branches:
+    include:
+      - development
+  paths:
+    exclude:
+      - "azure/*.yml"
 
 pool:
   vmImage: ubuntu-latest
