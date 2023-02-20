@@ -8,5 +8,5 @@ appVersion: "${appVersion}"
 dependencies:
   - name: fraud-prevention-application
     version: "${fraudPreventionVersion}"
-    repository: oci://fsmakka.azurecr.io/helm/
+    repository: oci://fsmakka.azurecr.io/helm
     condition: fraud-prevention.enabled
