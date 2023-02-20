@@ -33,7 +33,7 @@ resources:
 stages:
   - stage: Build
     jobs:
-      - template: publish-and-prepare-environment-template@ServiceUmbrellaChartRepository
+      - template: publish-and-prepare-environment-template.yml@ServiceUmbrellaChartRepository
         parameters:
           branchName: ${{ parameters.branchName }}
           repoName: ${{ parameters.repoName }}
