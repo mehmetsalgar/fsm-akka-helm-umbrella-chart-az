@@ -33,71 +33,9 @@ resources:
 stages:
   - stage: Build
     jobs:
-      - job: CreateBranchCalculateVersion
-        displayName: Create Branch Calculate Version
-        steps:
-        - checkout: ServiceUmbrellaChartRepository
-          fetchDepth: 0
-          fetchTags: true
-        - task: gitversion/setup@0
-          displayName: Install GitVersion
-          inputs:
-            versionSpec: "5.x"
-        - task: gitversion/execute@0
-          name: calculateVersion
-          displayName: Calculating version
-          inputs:
-            useConfigFile: True
-            configFilePath: "GitVersion.yml"
-            additionalArguments: '"/b" "${{ parameters.branchName }}"'
-          env:
-            IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1
-      - job: HelmPushServiceUmbrellaChart
-        displayName: Helm Push Service Umbrella Chart
-        dependsOn: CreateBranchCalculateVersion
-        pool:
-          vmImage: ubuntu-latest
-        variables:
-          version: $[dependencies.CreateBranchCalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
-          service-version: ${{ parameters.serviceVersion }}
-          source-repo: ${{ parameters.repoName }}
-        steps:
-          - checkout: ServiceUmbrellaChartRepository
-          - task: Gradle@3
-            env:
-              ORG_GRADLE_PROJECT_HELM_USER: $(HELM_USER)
-              ORG_GRADLE_PROJECT_HELM_PASSWORD: $(HELM_PASSWORD)
-              ORG_GRADLE_PROJECT_DOCKER_HUB_USER: $(DOCKER_HUB_USER)
-              ORG_GRADLE_PROJECT_DOCKER_HUB_PASSWORD: $(DOCKER_HUB_PASSWORD)
-              ORG_GRADLE_PROJECT_DOCKER_UPLOAD_USER: $(DOCKER_UPLOAD_USER)
-              ORG_GRADLE_PROJECT_DOCKER_UPLOAD_PASSWORD: $(DOCKER_UPLOAD_PASSWORD)
-            inputs:
-              workingDirectory: ''
-              gradleWrapperFile: 'gradlew'
-              gradleOptions: '-Xmx3072m'
-              javaHomeOption: 'JDKVersion'
-              jdkVersionOption: '1.17'
-              jdkArchitectureOption: 'x64'
-              publishJUnitResults: false
-              testResultsFiles: '**/TEST-*.xml'
-              tasks: 'helmPackage -Pversion=$(version) -P$(source-repo)-version=$(service-version) --no-daemon'
-          - pwsh: |
-              helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
-              helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-az-$(version).tgz oci://fsmakka.azurecr.io/helm
-      - job: PreparingDevEnvironmentRepository
-        displayName: Preparing Dev Environment Repository
-        dependsOn:
-          - CreateBranchCalculateVersion
-          - HelmPushServiceUmbrellaChart
-        variables:
-          version: $[dependencies.CreateBranchCalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
-          umbrella-chart-base-name: ${{ parameters.umbrellaChartBaseName }}
-          service-version: ${{ parameters.serviceVersion }}
-          source-repo: ${{ parameters.repoName }}
-        steps:
-          #Prepare Services for new Environment <-> fsm-akka-dev-environment
-          - template: dispatch.yml@fsm-akka-azure-pipelines
-            parameters:
-              definitionId: "18"
-              sourceBranch: "$(umbrella-chart-base-name)"
-              inputs: '"branchName": "${{ parameters.branchName }}","tag": "$(source-repo)-$(service-version)", "version": "$(version)"'
+      - template: publish-and-prepare-environment-template@ServiceUmbrellaChartRepository
+        parameters:
+          branchName: ${{ parameters.branchName }}
+          repoName: ${{ parameters.repoName }}
+          serviceVersion: ${{ parameters.serviceVersion }}
+          umbrellaChartBaseName: ${{ parameters.umbrellaChartBaseName }}
