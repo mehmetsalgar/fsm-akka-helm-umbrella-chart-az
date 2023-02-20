@@ -1,0 +1,16 @@
+name: Continous Deployment Integration Helm Umbrella Chart
+trigger:
+  branches:
+    include:
+      - refs/heads/integration/*
+  paths:
+    exclude:
+      - "azure/*.yml"
+
+stages:
+  - stage: Build
+    jobs:
+      - job: ABC
+        steps:
+          - bash: |
+              echo 'test'
