@@ -50,6 +50,8 @@ stages:
             useConfigFile: True
             configFilePath: "GitVersion.yml"
             additionalArguments: '"/b" "${{ parameters.branchName }}"'
+          env:
+            IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1
       - job: HelmPushServiceUmbrellaChart
         displayName: Helm Push Service Umbrella Chart
         dependsOn: CreateBranchCalculateVersion
