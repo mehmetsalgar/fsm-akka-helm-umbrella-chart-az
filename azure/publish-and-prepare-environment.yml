@@ -25,11 +25,6 @@ resources:
       endpoint: mehmetsalgar
       name: mehmetsalgar/fsm-akka-helm-umbrella-chart-az
       ref: ${{ parameters.branchName }}
-    - repository: ServiceUmbrellaChartRepositoryDevelopment
-      type: github
-      endpoint: mehmetsalgar
-      name: mehmetsalgar/fsm-akka-helm-umbrella-chart-az
-      ref: 'development'
     - repository: fsm-akka-azure-pipelines
       type: github
       name: mehmetsalgar/fsm-akka-azure-pipelines
@@ -38,7 +33,7 @@ resources:
 stages:
   - stage: Build
     jobs:
-      - template: publish-and-prepare-environment-template.yml@ServiceUmbrellaChartRepositoryDevelopment
+      - template: azure/publish-and-prepare-environment-template.yml@ServiceUmbrellaChartRepository
         parameters:
           branchName: ${{ parameters.branchName }}
           repoName: ${{ parameters.repoName }}
