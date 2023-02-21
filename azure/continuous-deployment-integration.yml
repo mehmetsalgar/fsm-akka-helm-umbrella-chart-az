@@ -7,10 +7,36 @@ trigger:
     exclude:
       - "azure/*.yml"
 
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  - group: HELM_VARIABLES
+  - group: DOCKER_VARIABLES
+
+resources:
+  repositories:
+    - repository: ServiceUmbrellaChartRepository
+      type: github
+      endpoint: mehmetsalgar
+      name: mehmetsalgar/fsm-akka-helm-umbrella-chart-az
+      ref: ${{ parameters.branchName }}
+    - repository: ServiceUmbrellaChartRepositoryDevelopment
+      type: github
+      endpoint: mehmetsalgar
+      name: mehmetsalgar/fsm-akka-helm-umbrella-chart-az
+      ref: 'development'
+    - repository: fsm-akka-azure-pipelines
+      type: github
+      name: mehmetsalgar/fsm-akka-azure-pipelines
+      endpoint: mehmetsalgar
+
 stages:
   - stage: Build
     jobs:
-      - job: ABC
-        steps:
-          - bash: |
-              echo 'test'
+      - template: azure/publish-and-prepare-environment-template.yml@ServiceUmbrellaChartRepositoryDevelopment
+        parameters:
+          branchName: $(Build.SourceBranch)
+          repoName: ${{ parameters.repoName }}
+          serviceVersion: ${{ parameters.serviceVersion }}
+          umbrellaChartBaseName: 'development'
