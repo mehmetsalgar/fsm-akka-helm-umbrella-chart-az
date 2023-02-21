@@ -41,10 +41,10 @@ jobs:
       - checkout: ServiceUmbrellaChartRepository
       - template: helm-package-template.yml@ServiceUmbrellaChartRepositoryDevelopment
         parameters:
-          command: "helmPackage -Pversion=$(version) -P$(source-repo)-version=$(service-version) --no-daemon"
+          command: "helmPackage -Pversion=$(source-repo)-$(version) -P$(source-repo)-version=$(service-version) --no-daemon"
       - pwsh: |
           helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
-          helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-az-$(version).tgz oci://fsmakka.azurecr.io/helm
+          helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-az-(source-repo)-$(version).tgz oci://fsmakka.azurecr.io/helm
   - job: PreparingDevEnvironmentRepository
     displayName: Preparing Dev Environment Repository
     dependsOn:
@@ -61,4 +61,4 @@ jobs:
         parameters:
           definitionId: "18"
           sourceBranch: "$(umbrella-chart-base-name)"
-          inputs: '"branchName": "${{ parameters.branchName }}","tag": "$(source-repo)-$(service-version)", "version": "$(version)"'
+          inputs: '"branchName": "${{ parameters.branchName }}","tag": "$(source-repo)-$(service-version)", "version": "$(source-repo)-$(version)"'
