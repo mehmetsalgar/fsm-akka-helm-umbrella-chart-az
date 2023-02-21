@@ -90,7 +90,7 @@ stages:
           - template: dispatch.yml@fsm-akka-azure-pipelines
             parameters:
               definitionId: "17"
-              sourceBranch: "$(infrastructure-base-branch-name)"
+              sourceBranch: "development"
               inputs: '"branchName": "integration/$(branch-name)", "valueFile": "$(value-file)"'
           #Build Service Environment - fsm-akka-4eyes-argocd
           - template: dispatch.yml@fsm-akka-azure-pipelines
