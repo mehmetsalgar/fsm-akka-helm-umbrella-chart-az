@@ -39,7 +39,7 @@ jobs:
       source-repo: ${{ parameters.repoName }}
     steps:
       - checkout: ServiceUmbrellaChartRepository
-      - template: azure/helm-package-template.yml@ServiceUmbrellaChartRepositoryDevelopment
+      - template: helm-package-template.yml@ServiceUmbrellaChartRepositoryDevelopment
         parameters:
           command: "helmPackage -Pversion=$(version) -P$(source-repo)-version=$(service-version) --no-daemon"
       - pwsh: |
