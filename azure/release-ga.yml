@@ -1,0 +1,10 @@
+name: Helm Umbrella Chart Release GA
+trigger: none
+
+stages:
+  - stage: Build
+    jobs:
+      - job: ABC
+        steps:
+          - bash: |
+              echo 'Halli hallo'
