@@ -44,7 +44,7 @@ jobs:
           command: "helmPackage -Pversion=$(version)-$(source-repo) -P$(source-repo)-version=$(service-version) --no-daemon"
       - pwsh: |
           helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
-          helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-az-(source-repo)-$(version).tgz oci://fsmakka.azurecr.io/helm
+          helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-az-$(source-repo)-$(version).tgz oci://fsmakka.azurecr.io/helm
   - job: PreparingDevEnvironmentRepository
     displayName: Preparing Dev Environment Repository
     dependsOn:
