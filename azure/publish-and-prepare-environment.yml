@@ -24,7 +24,7 @@ resources:
       type: github
       endpoint: mehmetsalgar
       name: mehmetsalgar/fsm-akka-helm-umbrella-chart-az
-      ref: "${{ parameters.branchName }}-${{ parameters.repoName }}
+      ref: ${{ parameters.branchName }}-${{ parameters.repoName }}
     - repository: ServiceUmbrellaChartRepositoryDevelopment
       type: github
       endpoint: mehmetsalgar
