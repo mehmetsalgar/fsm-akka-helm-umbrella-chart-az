@@ -20,4 +20,4 @@ stages:
     jobs:
       - template: cleanup-environment.yml@fsm-akka-azure-pipelines
         parameters:
-          branchName: integration/${{ parameters.branchName }}"
+          branchName: "integration/${{ parameters.branchName }}"
