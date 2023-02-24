@@ -1,4 +1,4 @@
-name: CreateBranchwithReuse
+name: DeleteBranchwithReuse
 trigger: none
 
 parameters:

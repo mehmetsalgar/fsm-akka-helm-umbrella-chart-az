@@ -2,7 +2,7 @@ name: Continuous Deployment Integration Helm Umbrella Chart
 trigger:
   branches:
     include:
-      - refs/heads/integration/*
+      - refs/heads/feature/*
   paths:
     exclude:
       - "azure/*.yml"
@@ -24,4 +24,4 @@ resources:
 stages:
   - template: continuous-deployment-template.yml@self
     parameters:
-      infrastructureSourceBranch: "master"
+      infrastructureSourceBranch: "development"
