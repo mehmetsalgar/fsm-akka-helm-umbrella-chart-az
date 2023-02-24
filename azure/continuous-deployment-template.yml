@@ -1,0 +1,81 @@
+parameters:
+  - name: infrastructureSourceBranch
+    type: string
+
+stages:
+  - stage: Build
+    jobs:
+      - job: CalculateBranchName
+        steps:
+          - bash: |
+              echo "##vso[task.setvariable variable=myBranchName;isoutput=true]$(basename $bn)"
+            name: cbn
+            env:
+              bn: $(Build.SourceBranch)
+      - job: CreateBranchCalculateVersion
+        displayName: Create Branch Calculate Version
+        dependsOn:
+          - CalculateBranchName
+        variables:
+          branch-name: $[dependencies.CalculateBranchName.outputs['cbn.myBranchName']]
+        steps:
+          - checkout: self
+            fetchDepth: 0
+            fetchTags: true
+          - task: gitversion/setup@0
+            displayName: Install GitVersion
+            inputs:
+              versionSpec: "5.x"
+          - task: gitversion/execute@0
+            name: calculateVersion
+            displayName: Calculating version
+            inputs:
+              useConfigFile: True
+              configFilePath: "GitVersion.yml"
+              additionalArguments: '"/b" "integration/$(branch-name)"'
+            env:
+              IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1
+      - job: HelmPushServiceUmbrellaChart
+        displayName: Helm Push Service Umbrella Chart
+        dependsOn:
+          - CreateBranchCalculateVersion
+        pool:
+          vmImage: ubuntu-latest
+        variables:
+          version: $[dependencies.CreateBranchCalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
+        steps:
+          - checkout: self
+          - template: helm-package-template.yml@self
+            parameters:
+              command: "helmPackage -Pversion=$(version) --no-daemon"
+          - pwsh: |
+              helm registry login fsmakka.azurecr.io --username $(HELM_USER) --password $(HELM_PASSWORD)
+              helm push /home/vsts/work/1/s/build/helm/charts/fsm-akka-helm-umbrella-chart-az-$(version).tgz oci://fsmakka.azurecr.io/helm
+      - job: PreparingDevEnvironmentRepository
+        displayName: Preparing Dev Environment Repository
+        dependsOn:
+          - CalculateBranchName
+          - CreateBranchCalculateVersion
+          - HelmPushServiceUmbrellaChart
+        variables:
+          branch-name: $[dependencies.CalculateBranchName.outputs['cbn.myBranchName']]
+          version: $[dependencies.CreateBranchCalculateVersion.outputs['calculateVersion.GitVersion.SemVer']]
+        steps:
+          #Prepare Services for new Environment <-> fsm-akka-dev-environment
+          - template: dispatch.yml@fsm-akka-azure-pipelines
+            parameters:
+              definitionId: "18"
+              sourceBranch: "development"
+              inputs: '"branchName": "integration/$(branch-name)", "tag": "$(version)", "version": "$(version)"'
+          #Build Infrastructure for Environment <-> fsm-akka-helm-infrastructure-chart-az
+          - template: dispatch.yml@fsm-akka-azure-pipelines
+            parameters:
+              definitionId: "17"
+              sourceBranch: ${{ parameters.infrastructureSourceBranch }}
+              inputs: '"branchName": "integration/$(branch-name)", "valueFile": "$(value-file)"'
+          #Build Service Environment - fsm-akka-4eyes-argocd
+          - template: dispatch.yml@fsm-akka-azure-pipelines
+            parameters:
+              definitionId: "21"
+              sourceBranch: "master"
+              inputs: '"branchName": "integration/$(branch-name)"'
