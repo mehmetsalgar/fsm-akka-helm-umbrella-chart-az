@@ -16,10 +16,8 @@ resources:
       endpoint: mehmetsalgar
 
 stages:
-  - stage: Build
+  - stage: Deploy
     jobs:
-      - job: CreateBranch
-        steps:
-          - template: cleanup-environment.yml@fsm-akka-azure-pipelines
-            parameters:
-              branchName: "integration/${{ parameters.branchName }}"
+      - template: cleanup-environment.yml@fsm-akka-azure-pipelines
+        parameters:
+          branchName: integration/${{ parameters.branchName }}"
