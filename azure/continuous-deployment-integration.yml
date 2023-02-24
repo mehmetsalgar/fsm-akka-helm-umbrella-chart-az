@@ -25,3 +25,4 @@ stages:
   - template: continuous-deployment-template.yml@self
     parameters:
       infrastructureSourceBranch: "master"
+      buildType: "integration"
