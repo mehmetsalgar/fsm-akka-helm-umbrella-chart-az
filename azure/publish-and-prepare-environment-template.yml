@@ -25,7 +25,7 @@ jobs:
         inputs:
           useConfigFile: True
           configFilePath: "GitVersion.yml"
-          additionalArguments: '"/b" "${{ parameters.branchName }}"'
+          additionalArguments: '"/b" "${{ parameters.branchName }}-${{ parameters.repoName }}"'
         env:
           IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1
   - job: HelmPushServiceUmbrellaChart
