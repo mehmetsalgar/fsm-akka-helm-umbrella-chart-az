@@ -9,7 +9,6 @@ parameters:
     type: string
 
 jobs:
-  - checkout: ServiceUmbrellaChartRepository
   - job: CreateBranchCalculateVersion
     displayName: Create Branch Calculate Version
     steps:
