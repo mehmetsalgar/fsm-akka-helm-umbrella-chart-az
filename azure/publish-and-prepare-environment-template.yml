@@ -61,4 +61,4 @@ jobs:
         parameters:
           definitionId: "18"
           sourceBranch: "$(umbrella-chart-base-name)"
-          inputs: '"branchName": "${{ parameters.branchName }}-$(source-repo)","tag": "$(source-repo)-$(service-version)", "version": "$(version)-$(source-repo)"'
+          inputs: '"branchName": "${{ parameters.branchName }}-$(source-repo)","tag": "$(source-repo)-$(service-version)", "version": "$(version)"'
