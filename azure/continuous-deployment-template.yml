@@ -1,6 +1,8 @@
 parameters:
   - name: infrastructureSourceBranch
     type: string
+  - name: buildType
+    type: string
 
 stages:
   - stage: Build
@@ -32,7 +34,7 @@ stages:
             inputs:
               useConfigFile: True
               configFilePath: "GitVersion.yml"
-              additionalArguments: '"/b" "integration/$(branch-name)"'
+              additionalArguments: '"/b" "${{ parameters.buildType }}/$(branch-name)"'
             env:
               IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1
       - job: HelmPushServiceUmbrellaChart
@@ -66,16 +68,16 @@ stages:
             parameters:
               definitionId: "18"
               sourceBranch: "development"
-              inputs: '"branchName": "integration/$(branch-name)", "tag": "$(version)", "version": "$(version)"'
+              inputs: '"branchName": "${{ parameters.buildType }}/$(branch-name)", "tag": "$(version)", "version": "$(version)"'
           #Build Infrastructure for Environment <-> fsm-akka-helm-infrastructure-chart-az
           - template: dispatch.yml@fsm-akka-azure-pipelines
             parameters:
               definitionId: "17"
               sourceBranch: ${{ parameters.infrastructureSourceBranch }}
-              inputs: '"branchName": "integration/$(branch-name)", "valueFile": "$(value-file)"'
+              inputs: '"branchName": "${{ parameters.buildType }}/$(branch-name)", "valueFile": "$(value-file)"'
           #Build Service Environment - fsm-akka-4eyes-argocd
           - template: dispatch.yml@fsm-akka-azure-pipelines
             parameters:
               definitionId: "21"
               sourceBranch: "master"
-              inputs: '"branchName": "integration/$(branch-name)"'
+              inputs: '"branchName": "${{ parameters.buildType }}/$(branch-name)"'

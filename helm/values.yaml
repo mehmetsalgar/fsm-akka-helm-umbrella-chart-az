@@ -4,7 +4,7 @@ credit-score:
   enabled: true
 fraud-prevention:
   enabled: true
-customer-relation-adapter:
+customer-relationship-adapter-application:
   enabled: true
 fsm-akka-4eyes-application:
   enabled: true

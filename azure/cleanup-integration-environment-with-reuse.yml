@@ -1,4 +1,4 @@
-name: CreateBranchWithReuse
+name: CleanupEpicEnvironment
 trigger: none
 
 parameters:
@@ -16,10 +16,8 @@ resources:
       endpoint: mehmetsalgar
 
 stages:
-  - stage: Build
+  - stage: Deploy
     jobs:
-      - job: CreateBranch
-        steps:
-          - template: create-branch.yml@fsm-akka-azure-pipelines
-            parameters:
-              branchName: ${{ parameters.branchName }}
+      - template: cleanup-environment.yml@fsm-akka-azure-pipelines
+        parameters:
+          branchName: "integration/${{ parameters.branchName }}"

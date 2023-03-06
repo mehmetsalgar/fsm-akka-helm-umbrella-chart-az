@@ -22,6 +22,7 @@ if(ext.flag) {
     ext.props = [
             HELM_USER: property('HELM_USER'),
             HELM_PASSWORD: property('HELM_PASSWORD'),
+            CUSTOMER_RELATIONSHIP_ADAPTER_VERSION: property('customer-relationship-adapter-version'),
             FRAUD_PREVENTION_VERSION: property('fraud-prevention-version')
     ]
 }
@@ -34,6 +35,7 @@ helm {
             sourceDir = file('helm')
             filtering {
                 values.put 'appVersion', "${project.version}-${gitBranch()}"
+                values.put 'customerRelationshipAdapterVersion', "${props.CUSTOMER_RELATIONSHIP_ADAPTER_VERSION}"
                 values.put 'fraudPreventionVersion', "${props.FRAUD_PREVENTION_VERSION}"
             }
         }

@@ -6,6 +6,10 @@ version: 1.5.14
 appVersion: "${appVersion}"
 
 dependencies:
+  - name: customer-relationship-adapter-application
+    version: "${customerRelationshipAdapterVersion}"
+    repository: oci://fsmakka.azurecr.io/helm
+    condition: customer-relationship-adapter-application.enabled
   - name: fraud-prevention-application
     version: "${fraudPreventionVersion}"
     repository: oci://fsmakka.azurecr.io/helm
