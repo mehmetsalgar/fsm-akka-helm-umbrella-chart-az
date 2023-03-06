@@ -1,4 +1,4 @@
-name: Continuous Deployment Integration Helm Umbrella Chart
+name: Continuous Deployment Epic Helm Umbrella Chart
 trigger:
   branches:
     include:
