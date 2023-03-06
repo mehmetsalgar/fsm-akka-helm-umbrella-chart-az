@@ -34,7 +34,7 @@ stages:
             inputs:
               useConfigFile: True
               configFilePath: "GitVersion.yml"
-              additionalArguments: '"/b" "integration/$(branch-name)"'
+              additionalArguments: '"/b" "${{ parameters.buildType }}/$(branch-name)"'
             env:
               IGNORE_NORMALISATION_GIT_HEAD_MOVE: 1
       - job: HelmPushServiceUmbrellaChart
